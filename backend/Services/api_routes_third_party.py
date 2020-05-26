@@ -1,0 +1,1 @@
+__FETCH_USER_DATA_FB = "https://graph.facebook.com/v7.0/me"
