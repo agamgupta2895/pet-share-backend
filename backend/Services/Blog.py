@@ -10,7 +10,7 @@ import hashlib
 
 blogsService = Blueprint("blogService",__name__)
 
-@blogsService.route(api_routes.__BLOGS_CRUD,methods = ["POST","GET"])
+@blogsService.route(api_routes.__BLOGS_CU,methods = ["POST","GET"])
 def blogs_crud():
     response_object = {}
     access_token = request.headers['Authorization']
@@ -41,4 +41,34 @@ def blogs_crud():
             response_object["error"] = blog_created["error"]
             return response_object
         return response_object
+    
+
+@blogsService.route(api_routes.__BLOG,methods = ["DELETE","GET"])
+def blogs(blog_id):
+    response_object = {}
+    access_token = request.headers['Authorization']
+    is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+    blog = Blog()
+    if is_authorized == False:
+        response_object["error"] = "Not authorized user"
+        #:TODO: return status code
+        return response_object
+    if request.method == "GET":
+        #call blogs object
+        blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
+        if "error" in blog:
+            response_object["error"] = blog["error"]
+            return response_object
+        response_object["data"] = blog[0]["node"]
+        return response_object
+    elif request.method == "DELETE":
+        pass
+        #Delete blog
+        # image =  request.files.get('image')
+        # data = request.form.get("data")
+        #blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
+        # if "error" in blog_created:
+        #     response_object["error"] = blog_created["error"]
+        #     return response_object
+        # return response_object
     

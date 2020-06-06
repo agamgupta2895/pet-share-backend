@@ -26,7 +26,27 @@ class Blog:
         except Exception as err:
             response["error"] = str(err)
             return response
+    def fetch_blog(self,user_id,blog_id):
+        """
+        :user_id - ID of the logged in user
+        :response - 
+        """
+        response = {}
+        print("started")
+        try:
+            graph_response = self.graph.run("""
+                                    Match (node:{BLOG_LABEL}  {{id:"{BLOG_ID}"}})
+                                    return node
+                                    """.format(
+                                            BLOG_LABEL = "Blog",
+                                            BLOG_ID = blog_id
+                                    )).data()
+            return graph_response
+        except Exception as err:
+            response["error"] = str(err)
+            return response
 
+    
     def create_or_update_blog(self,user_id,image,data):
         """
         :user_id - ID of the logged in user
