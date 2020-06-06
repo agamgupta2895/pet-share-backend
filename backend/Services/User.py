@@ -55,4 +55,4 @@ def fetch_user_details_fb():
 @userService.route("/",methods = ["GET"])
 def landing():
     print("here")
-    return "Hello World!"
+    return "Hello World!"   
