@@ -26,7 +26,10 @@ def blogs_crud():
         if "error" in blogs_list:
             response_object["error"] = blogs_list["error"]
             return response_object
-        response_object["data"] = blogs_list
+        data = []
+        for item in blogs_list:
+            data.append(item["node"])
+        response_object["data"] = data
         return response_object
     elif request.method == "POST":
         #Create new blog
