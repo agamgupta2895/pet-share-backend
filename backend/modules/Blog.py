@@ -34,6 +34,7 @@ class Blog:
         """
         response = {}
         try:
+            print("in create or update")
             data = data.encode('ascii','ignore')
             data = json.loads(data)
             if "id" in data:

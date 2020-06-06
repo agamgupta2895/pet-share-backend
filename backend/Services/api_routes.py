@@ -1,4 +1,4 @@
-__HOST = "0.0.0.0"
+__HOST = "35.154.113.82"
 __LOGIN_USER_FB = "/api/v1/fb/login"
 
 
