@@ -13,16 +13,11 @@ blogsService = Blueprint("blogService",__name__)
 @blogsService.route(api_routes.__BLOGS_CU,methods = ["POST","GET"])
 def blogs_crud():
     response_object = {}
-    access_token = request.headers['Authorization']
-    is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+    
     blog = Blog()
-    if is_authorized == False:
-        response_object["error"] = "Not authorized user"
-        #:TODO: return status code
-        return response_object
     if request.method == "GET":
         #call blogs object
-        blogs_list = blog.fetch_all_blogs(user_id=user_id)
+        blogs_list = blog.fetch_all_blogs(user_id="user_id")
         if "error" in blogs_list:
             response_object["error"] = blogs_list["error"]
             return response_object
@@ -32,6 +27,12 @@ def blogs_crud():
         response_object["data"] = data
         return response_object
     elif request.method == "POST":
+        access_token = request.headers['Authorization']
+        is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+        if is_authorized == False:
+            response_object["error"] = "Not authorized user"
+            #:TODO: return status code
+            return response_object
         #Create new blog
         #create  new blog id
         image =  request.files.get('image')

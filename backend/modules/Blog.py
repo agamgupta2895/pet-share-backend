@@ -26,13 +26,13 @@ class Blog:
         except Exception as err:
             response["error"] = str(err)
             return response
+            
     def fetch_blog(self,user_id,blog_id):
         """
         :user_id - ID of the logged in user
         :response - 
         """
-        response = {}
-        print("started")
+        response = {}        
         try:
             graph_response = self.graph.run("""
                                     Match (node:{BLOG_LABEL}  {{id:"{BLOG_ID}"}})
