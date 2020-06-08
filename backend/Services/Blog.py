@@ -38,6 +38,8 @@ def blogs_crud():
         image =  request.files.get('image')
         data = request.form.get("data")
         blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
+        print("%%%%%%%")
+        print(blog_created)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
             return response_object
@@ -56,20 +58,21 @@ def blogs(blog_id):
         return response_object
     if request.method == "GET":
         #call blogs object
-        blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
+        blog = blog.fetch_blog(user_id="user_id",blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
             return response_object
         response_object["data"] = blog[0]["node"]
         return response_object
     elif request.method == "DELETE":
-        pass
+        print("Deleting")
         #Delete blog
-        # image =  request.files.get('image')
-        # data = request.form.get("data")
-        #blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
-        # if "error" in blog_created:
-        #     response_object["error"] = blog_created["error"]
-        #     return response_object
-        # return response_object
+        print(user_id)
+        print(blog_id)
+        blog_deleted = blog.delete_a_blog(user_id,blog_id)
+        if "error" in blog_deleted:
+            response_object["error"] = blog_deleted["error"]
+            return response_object
+        response_object["message"] = blog_created["message"]
+        return response_object
     

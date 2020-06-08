@@ -21,12 +21,11 @@ class Blog:
                                     """.format(
                                             BLOG_LABEL = "Blog"
                                     )).data()
-            
             return graph_response
         except Exception as err:
             response["error"] = str(err)
             return response
-            
+
     def fetch_blog(self,user_id,blog_id):
         """
         :user_id - ID of the logged in user
@@ -76,6 +75,9 @@ class Blog:
             data["image_url"] = s3_base_url + blog_path
             property_string = helper.create_property_string("blog",data)
             property_string = property_string["properties"][:-2]
+            print("######")
+            print(property_string)
+            print("######")
             blog_query = """
                     MERGE (blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
                     ON CREATE SET
@@ -87,6 +89,9 @@ class Blog:
                             PROPERTY_STRING = property_string,
                             BLOG_ID = blog_id
                     )
+            print("######")
+            print(blog_query)
+            print("######")
             graph_response = self.graph.run(blog_query).data()
             relationship_query = """
                         Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
@@ -102,6 +107,53 @@ class Blog:
             graph_response = self.graph.run(relationship_query).data()
             return response
             
+        except Exception as err:
+            response["error"] = str(err)
+            return response
+    def delete_a_blog(self,user_id,blog_id):
+        """
+        """
+        response = {}
+        try:
+            query_to_fetch_blog = """
+                            Match(user:{USER_LABEL} {{id:"{USER_ID}"}})-[rel:{CREATED_LABEL}]->(blog:{BLOG_LABEL}{{id:"{BLOG_ID}"}})
+                            return blog
+                        """.format(
+                            USER_ID = user_id,
+                            USER_LABEL = "User",
+                            CREATED_LABEL = "CREATED",
+                            BLOG_LABEL = "Blog",
+                            BLOG_ID = blog_id
+                        )
+            graph_response = self.graph.run(query_to_fetch_blog).data()
+            if len(graph_response) >0 :
+                image_url = graph_response[0]["blog"]["image_url"]
+                path = image_url.split("/")
+                path = path[-3] + "/" + path[-2] + "/" + path[-1]
+                delete_list = [
+                    {
+                        'Key' : path
+                    }
+                ]
+                bucket = self.client.delete_objects(
+                    Bucket = "pet-share-india",
+                    Delete = {
+                        'Objects' : delete_list
+                    }
+                )
+                
+                query_to_delete_blog = """
+                                Match (blog:{BLOG_LABEL}{{id:"{BLOG_ID}"}})
+                                detach delete blog
+                            """.format(
+                                BLOG_LABEL = "Blog",
+                                BLOG_ID=blog_id
+                            )
+                graph_response = self.graph.run(query_to_delete_blog).data()
+                response["message"] = "delete successfully"    
+            else:
+                response["error"] = "Invalid user trying to delete the blog"
+            return response
         except Exception as err:
             response["error"] = str(err)
             return response
