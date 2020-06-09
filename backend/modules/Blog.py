@@ -45,7 +45,28 @@ class Blog:
             response["error"] = str(err)
             return response
 
-    
+    def add_a_public_image(self,image):
+        """"
+        """
+        response = {}
+        try:
+            image_id = uuid.uuid4().hex
+            image_path = "blogs/public/"+str(image_id)+"/blog_image.jpg"
+            bucket_name = 'pet-share-india'
+            response = self.client.put_object(
+                    ACL = 'public-read',
+                    Bucket = bucket_name,
+                    Key= image_path,
+                    Body = image,
+                    ContentType = 'image/png'
+                )
+            
+            s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
+            response["result"] = s3_base_url + image_path
+            return response
+        except Exception as err:
+            response["error"] = str(err)
+            return response
     def create_or_update_blog(self,user_id,image,data):
         """
         :user_id - ID of the logged in user
@@ -53,7 +74,6 @@ class Blog:
         """
         response = {}
         try:
-            print("in create or update")
             data = data.encode('ascii','ignore')
             data = json.loads(data)
             if "id" in data:
@@ -61,23 +81,21 @@ class Blog:
             else:
                 blog_id = uuid.uuid4().hex
                 data["id"]= blog_id
-            blog_path = "blogs/"+str(blog_id)+"/blog_image.jpg"
-            bucket_name = 'pet-share-india'
-            response = self.client.put_object(
-                    ACL = 'public-read',
-                    Bucket = bucket_name,
-                    Key= blog_path,
-                    Body = image,
-                    ContentType = 'image/png'
-                )
-            
-            s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
-            data["image_url"] = s3_base_url + blog_path
+            if image is not None:
+                blog_path = "blogs/"+str(blog_id)+"/blog_image.jpg"
+                bucket_name = 'pet-share-india'
+                response = self.client.put_object(
+                        ACL = 'public-read',
+                        Bucket = bucket_name,
+                        Key= blog_path,
+                        Body = image,
+                        ContentType = 'image/png'
+                    )
+                
+                s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
+                data["image_url"] = s3_base_url + blog_path
             property_string = helper.create_property_string("blog",data)
             property_string = property_string["properties"][:-2]
-            print("######")
-            print(property_string)
-            print("######")
             blog_query = """
                     MERGE (blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
                     ON CREATE SET
@@ -89,9 +107,6 @@ class Blog:
                             PROPERTY_STRING = property_string,
                             BLOG_ID = blog_id
                     )
-            print("######")
-            print(blog_query)
-            print("######")
             graph_response = self.graph.run(blog_query).data()
             relationship_query = """
                         Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
