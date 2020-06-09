@@ -40,7 +40,14 @@ class Blog:
                                             BLOG_LABEL = "Blog",
                                             BLOG_ID = blog_id
                                     )).data()
-            return graph_response
+            node = dict(graph_response[0]["node"])
+            if user_id == node["created_by"]:
+                node["is_owner"] = True
+            else:
+                node["is_owner"] = False
+            response["Blog"] = node
+            print(response)
+            return response
         except Exception as err:
             response["error"] = str(err)
             return response
@@ -76,6 +83,7 @@ class Blog:
         try:
             data = data.encode('ascii','ignore')
             data = json.loads(data)
+            data["created_by"] = user_id
             if "id" in data:
                 blog_id = data["id"]
             else:

@@ -53,8 +53,11 @@ def blogs_crud():
 @blogsService.route(api_routes.__BLOG,methods = ["DELETE","GET"])
 def blogs(blog_id):
     response_object = {}
-    access_token = request.headers['Authorization']
-    is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+    user_id = ''
+    is_authorized = True
+    if 'Authorization' in request.headers:
+        access_token = request.headers['Authorization']
+        is_authorized,user_id = Authorizer.fb_authorizer(access_token)
     blog = Blog()
     if user_id is None:
         response_object["error"] = "Please sign up"
@@ -66,11 +69,12 @@ def blogs(blog_id):
         return response_object
     if request.method == "GET":
         #call blogs object
-        blog = blog.fetch_blog(user_id="user_id",blog_id=blog_id)
+        blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
             return response_object
-        response_object["data"] = blog[0]["node"]
+        print(blog)
+        response_object["data"] = blog
         return response_object
     elif request.method == "DELETE":
         print("Deleting")
