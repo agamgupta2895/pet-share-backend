@@ -36,6 +36,7 @@ def fetch_user_details_fb():
     #create new user in backend
     property_string = helper.create_property_string("user",content)
     if "error" in property_string:
+        print("not present")
         response_object["error"] = property_string["error"]
         #:TODO: status code to be added
         return response_object

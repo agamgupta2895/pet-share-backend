@@ -45,6 +45,7 @@ class User:
                             PROPERTY_STRING = property_string,
                             USER_ID = user_id
                     )
+            print(query)
             graph_response = self.graph.run(query)
             return response
         except Exception as err:

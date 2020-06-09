@@ -29,6 +29,10 @@ def blogs_crud():
     elif request.method == "POST":
         access_token = request.headers['Authorization']
         is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+        if user_id is None:
+            response_object["error"] = "Please sign up"
+            #:TODO: return status code
+            return response_object
         if is_authorized == False:
             response_object["error"] = "Not authorized user"
             #:TODO: return status code
@@ -52,6 +56,10 @@ def blogs(blog_id):
     access_token = request.headers['Authorization']
     is_authorized,user_id = Authorizer.fb_authorizer(access_token)
     blog = Blog()
+    if user_id is None:
+        response_object["error"] = "Please sign up"
+        #:TODO: return status code
+        return response_object
     if is_authorized == False:
         response_object["error"] = "Not authorized user"
         #:TODO: return status code
