@@ -115,6 +115,7 @@ class Blog:
                             PROPERTY_STRING = property_string,
                             BLOG_ID = blog_id
                     )
+            print(blog_query)
             graph_response = self.graph.run(blog_query).data()
             relationship_query = """
                         Match (user:{USER_LABEL} {{id: "{USER_ID}"}})

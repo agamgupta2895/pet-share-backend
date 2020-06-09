@@ -9,8 +9,8 @@ def create_property_string(entity,properties):
 
         str_properties = ""
         for key,value in properties.items():
-            if type(value) == "str":
-                value = value.replace('"', '\\"')
+            value = str(value)   
+            value = value.replace('"', '\\"')
             row = "{entity}.{a}=".format(a=key, entity=entity) \
                         + "\"" + str(value) + "\",\n"""
             str_properties = str_properties + row
