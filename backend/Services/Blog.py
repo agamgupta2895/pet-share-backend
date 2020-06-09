@@ -81,7 +81,7 @@ def blogs(blog_id):
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]
             return response_object
-        response_object["message"] = blog_created["message"]
+        response_object["message"] = blog_deleted["message"]
         return response_object
 
 

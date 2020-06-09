@@ -141,21 +141,24 @@ class Blog:
                             BLOG_ID = blog_id
                         )
             graph_response = self.graph.run(query_to_fetch_blog).data()
-            if len(graph_response) >0 :
-                image_url = graph_response[0]["blog"]["image_url"]
-                path = image_url.split("/")
-                path = path[-3] + "/" + path[-2] + "/" + path[-1]
-                delete_list = [
-                    {
-                        'Key' : path
-                    }
-                ]
-                bucket = self.client.delete_objects(
-                    Bucket = "pet-share-india",
-                    Delete = {
-                        'Objects' : delete_list
-                    }
-                )
+            if len(graph_response) > 0 :
+                print(graph_response)
+                graph_response = graph_response[0]["blog"]
+                if "image_url" in graph_response:
+                    image_url = graph_response["image_url"]
+                    path = image_url.split("/")
+                    path = path[-3] + "/" + path[-2] + "/" + path[-1]
+                    delete_list = [
+                        {
+                            'Key' : path
+                        }
+                    ]
+                    bucket = self.client.delete_objects(
+                        Bucket = "pet-share-india",
+                        Delete = {
+                            'Objects' : delete_list
+                        }
+                    )
                 
                 query_to_delete_blog = """
                                 Match (blog:{BLOG_LABEL}{{id:"{BLOG_ID}"}})
@@ -165,9 +168,10 @@ class Blog:
                                 BLOG_ID=blog_id
                             )
                 graph_response = self.graph.run(query_to_delete_blog).data()
-                response["message"] = "delete successfully"    
-            else:
-                response["error"] = "Invalid user trying to delete the blog"
+                response["message"] = "delete successfully"
+                return response    
+            
+            response["error"] = "Invalid user trying to delete the blog"
             return response
         except Exception as err:
             response["error"] = str(err)
