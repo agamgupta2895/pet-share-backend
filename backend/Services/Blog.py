@@ -77,10 +77,7 @@ def blogs(blog_id):
         response_object["data"] = blog
         return response_object
     elif request.method == "DELETE":
-        print("Deleting")
         #Delete blog
-        print(user_id)
-        print(blog_id)
         blog_deleted = blog.delete_a_blog(user_id,blog_id)
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]

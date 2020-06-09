@@ -178,10 +178,10 @@ class Blog:
                             )
                 graph_response = self.graph.run(query_to_delete_blog).data()
                 response["message"] = "delete successfully"
-                return response    
-            
-            response["error"] = "Invalid user trying to delete the blog"
-            return response
+                return response
+            else:
+                response["error"] = "Invalid user trying to delete the blog"
+                return response
         except Exception as err:
             response["error"] = str(err)
             return response
