@@ -84,6 +84,13 @@ class Blog:
             data = data.encode('ascii','ignore')
             data = json.loads(data)
             data["created_by"] = user_id
+            user_details = helper.get_user_details(user_id=user_id,graph=self.graph)
+            if "error" in user_details:
+                response["error"] = user_details["error"]
+                return response
+            user_details = dict(user_details["data"])
+            data["author"] = user_details["name"]
+            
             if "id" in data:
                 blog_id = data["id"]
             else:
@@ -115,7 +122,6 @@ class Blog:
                             PROPERTY_STRING = property_string,
                             BLOG_ID = blog_id
                     )
-            print(blog_query)
             graph_response = self.graph.run(blog_query).data()
             relationship_query = """
                         Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
