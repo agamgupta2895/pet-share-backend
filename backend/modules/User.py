@@ -49,7 +49,26 @@ class User:
             graph_response = self.graph.run(query)
             return response
         except Exception as err:
-            print(str(err))
+            response["error"] = str(err)
+            return response
+
+    def fetch_user_blogs(self,user_id):
+
+        response = {}
+        try:
+            query = """
+                Match(user:{USER_LABEL} {{id:"{USER_ID}"}})-[rel:{CREATED_LABEL}]->(blogs:{BLOG_LABEL})
+                return blogs
+            """.format(
+                            USER_ID = user_id,
+                            USER_LABEL = "User",
+                            CREATED_LABEL = "CREATED",
+                            BLOG_LABEL = "Blog"
+                        )
+            graph_response = self.graph.run(query).data()
+            response["data"] = graph_response
+            return response
+        except Exception as err:
             response["error"] = str(err)
             return response
 

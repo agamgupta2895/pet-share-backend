@@ -1,5 +1,9 @@
 
 from py2neo import Graph,Node,Relationship
+import jwt
+import datetime
+
+
 
 def create_property_string(entity,properties):
     """
@@ -22,21 +26,29 @@ def create_property_string(entity,properties):
         response["error"] = str(err)
         return response
 
-def get_user_details(user_id,graph):
+def get_user_details(email=None,user_id=None,graph=None):
     """
     """
 
     response = {}
     try:
-        user_details_query = """
-                        Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
-                        return user
-                    """.format(
-                        USER_LABEL = "User",
-                        USER_ID = user_id
-                    )
+        if user_id is not None:
+            user_details_query = """
+                            Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
+                            return user
+                        """.format(
+                            USER_LABEL = "User",
+                            USER_ID = user_id
+                        )
+        elif email is not None:
+            user_details_query = """
+                            Match (user:{USER_LABEL} {{email: "{EMAIL}"}})
+                            return user
+                        """.format(
+                            USER_LABEL = "User",
+                            EMAIL = email
+                        )
         graph_response = graph.run(user_details_query).data()
-        print(graph_response)
         response["data"] = graph_response[0]["user"]
         return response
     except Exception as err:

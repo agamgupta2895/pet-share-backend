@@ -157,7 +157,6 @@ class Blog:
                         )
             graph_response = self.graph.run(query_to_fetch_blog).data()
             if len(graph_response) > 0 :
-                print(graph_response)
                 graph_response = graph_response[0]["blog"]
                 if "image_url" in graph_response:
                     image_url = graph_response["image_url"]

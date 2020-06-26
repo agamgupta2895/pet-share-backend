@@ -28,13 +28,10 @@ def blogs_crud():
         return response_object
     elif request.method == "POST":
         access_token = request.headers['Authorization']
-        is_authorized,user_id = Authorizer.fb_authorizer(access_token)
-        if user_id is None:
-            response_object["error"] = "Please sign up"
-            #:TODO: return status code
-            return response_object
-        if is_authorized == False:
-            response_object["error"] = "Not authorized user"
+        # Authorizer.
+        auth_result = Authorizer.validate_token(access_token)
+        if 'error' in auth_result:
+            response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
             return response_object
         #Create new blog
@@ -43,6 +40,7 @@ def blogs_crud():
         if image == None:
             print("No image found")
         data = request.form.get("data")
+        user_id = auth_result["user_id"]
         blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
@@ -54,30 +52,25 @@ def blogs_crud():
 def blogs(blog_id):
     response_object = {}
     user_id = ''
-    is_authorized = True
-    if 'Authorization' in request.headers:
-        access_token = request.headers['Authorization']
-        is_authorized,user_id = Authorizer.fb_authorizer(access_token)
     blog = Blog()
-    if user_id is None:
-        response_object["error"] = "Please sign up"
-        #:TODO: return status code
-        return response_object
-    if is_authorized == False:
-        response_object["error"] = "Not authorized user"
-        #:TODO: return status code
-        return response_object
     if request.method == "GET":
         #call blogs object
         blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
             return response_object
-        print(blog)
         response_object["data"] = blog
         return response_object
     elif request.method == "DELETE":
         #Delete blog
+        access_token = request.headers['Authorization']
+        auth_result = Authorizer.validate_token(access_token)
+        print(auth_result)
+        if 'error' in auth_result:
+            response_object["error"] = str(auth_result["error"])
+            #:TODO: return status code
+            return response_object
+        user_id = auth_result["user_id"]
         blog_deleted = blog.delete_a_blog(user_id,blog_id)
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]
@@ -90,23 +83,18 @@ def blogs(blog_id):
 def add_image():
     response_object = {}
     access_token = request.headers['Authorization']
-    is_authorized,user_id = Authorizer.fb_authorizer(access_token)
+    auth_result = Authorizer.validate_token(access_token)
+    if 'error' in auth_result:
+        response_object["error"] = str(auth_result["error"])
+        #:TODO: return status code
+        return response_object
     blog = Blog()
-    if user_id is None:
-        response_object["error"] = "Please sign up"
-        #:TODO: return status code
+    image =  request.files.get('image')
+    data = request.form.get("data")
+    image_added = blog.add_a_public_image(image= image)
+    if "error" in image_added:
+        response_object["error"] = image_added["error"]
         return response_object
-    if is_authorized == False:
-        response_object["error"] = "Not authorized user"
-        #:TODO: return status code
-        return response_object
-    if request.method == "POST":
-        image =  request.files.get('image')
-        data = request.form.get("data")
-        image_added = blog.add_a_public_image(image= image)
-        if "error" in image_added:
-            response_object["error"] = image_added["error"]
-            return response_object
-        response_object["result"] = image_added["result"]
-        return response_object
-    
+    response_object["result"] = image_added["result"]
+    return response_object
+

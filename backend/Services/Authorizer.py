@@ -2,7 +2,12 @@ import requests
 import api_routes_third_party
 import json
 from Contants import ServiceConstants
+from CommonUtils import helper
 from User import User
+import jwt
+import datetime
+
+
 
 def fb_authorizer(access_token):
     response_object = {}
@@ -22,3 +27,35 @@ def fb_authorizer(access_token):
     response_object["user_id"] = content["id"]
 
     return True,content["id"]
+
+def generate_tokens(data):
+    response = {
+        "tokens":{}
+    }
+    try:
+        access_token = jwt.encode(
+                            {
+                                'data': data,
+                                'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=2),
+                            }, 'pet-share-india', algorithm='HS256')
+        refresh_token = jwt.encode(
+                        {
+                            'data': data,
+                            'exp' : datetime.datetime.utcnow() + datetime.timedelta(days=7),
+                        }, 'pet-share-india', algorithm='HS256')
+        response["tokens"]["access_token"] = access_token
+        response["tokens"]["refresh_token"] = refresh_token
+        return response
+    except Exception as err:
+        response["error"] = str(err)
+        return response
+
+def validate_token(access_token):
+    response = {}
+    try:
+        decoded_jwt = jwt.decode(access_token, 'pet-share-india', algorithms=['HS256'])
+        print(decoded_jwt)
+        response["user_id"] = decoded_jwt["data"]["id"] 
+        return response
+    except Exception as err:
+        response["error"] = str(err)
