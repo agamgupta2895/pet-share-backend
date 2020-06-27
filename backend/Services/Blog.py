@@ -55,6 +55,15 @@ def blogs(blog_id):
     blog = Blog()
     if request.method == "GET":
         #call blogs object
+        if 'Authorization' in request.headers:
+            access_token = request.headers['Authorization']
+            auth_result = Authorizer.validate_token(access_token)
+            if 'error' in auth_result:
+                response_object["error"] = str(auth_result["error"])
+                #:TODO: return status code
+                return response_object
+            print(auth_result)
+            user_id = auth_result["user_id"]
         blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
@@ -65,7 +74,6 @@ def blogs(blog_id):
         #Delete blog
         access_token = request.headers['Authorization']
         auth_result = Authorizer.validate_token(access_token)
-        print(auth_result)
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code

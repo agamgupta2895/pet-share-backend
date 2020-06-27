@@ -87,6 +87,9 @@ def create_a_user():
         if "error" in if_email_is_present:
             response_object["error"]= if_email_is_present["error"]
             return response_object
+        print("*****")
+        print(data)
+        print("*****")
         tokens = Authorizer.generate_tokens(data)
         if "error" in tokens:
             response_object["error"] = tokens["error"]
