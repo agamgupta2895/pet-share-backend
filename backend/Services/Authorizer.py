@@ -53,8 +53,12 @@ def generate_tokens(data):
 def validate_token(access_token):
     response = {}
     try:
-        decoded_jwt = jwt.decode(access_token, 'pet-share-india', algorithms=['HS256'])
-        response["user_id"] = decoded_jwt["data"]["id"] 
+        try:
+            decoded_jwt = jwt.decode(access_token, 'pet-share-india', algorithms=['HS256'])
+        except Exception as err:
+            response["error"] = "Invalid token provided" 
+            return response
+        response["user_id"] = decoded_jwt["data"]["id"]
         return response
     except Exception as err:
         response["error"] = str(err)

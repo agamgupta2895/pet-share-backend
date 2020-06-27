@@ -168,6 +168,9 @@ def is_token_valid():
     access_token = request.args.get('access_token')
     # Authorizer.
     auth_result = Authorizer.validate_token(access_token)
+    print("*****")
+    print(auth_result)
+    print("*****")
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         response_object["is_valid"] = False
