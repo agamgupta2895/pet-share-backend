@@ -1,6 +1,7 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Blog import Blog
 from CommonUtils import helper
+from Contants import ServiceConstants
 import api_routes
 import api_routes_third_party
 import requests
@@ -20,7 +21,7 @@ def blogs_crud():
         blogs_list = blog.fetch_all_blogs(user_id="user_id")
         if "error" in blogs_list:
             response_object["error"] = blogs_list["error"]
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         data = []
         for item in blogs_list:
             data.append(item["node"])
@@ -33,7 +34,7 @@ def blogs_crud():
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
-            return response_object
+            return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         #Create new blog
         #create  new blog id
         image =  request.files.get('image')
@@ -44,7 +45,7 @@ def blogs_crud():
         blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         return response_object
     
 
@@ -61,13 +62,13 @@ def blogs(blog_id):
             if 'error' in auth_result:
                 response_object["error"] = str(auth_result["error"])
                 #:TODO: return status code
-                return response_object
+                return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
             print(auth_result)
             user_id = auth_result["user_id"]
         blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         response_object["data"] = blog
         return response_object
     elif request.method == "DELETE":
@@ -77,12 +78,12 @@ def blogs(blog_id):
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
-            return response_object
+            return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         user_id = auth_result["user_id"]
         blog_deleted = blog.delete_a_blog(user_id,blog_id)
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         response_object["message"] = blog_deleted["message"]
         return response_object
 
@@ -102,7 +103,7 @@ def add_image():
     image_added = blog.add_a_public_image(image= image)
     if "error" in image_added:
         response_object["error"] = image_added["error"]
-        return response_object
+        return response_object, ServiceConstants.__BAD_REQUEST
     response_object["result"] = image_added["result"]
     return response_object
 

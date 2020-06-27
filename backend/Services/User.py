@@ -32,7 +32,7 @@ def fetch_user_details_fb():
     if "error" in tokens:
         response_object["error"] = tokens["error"]
         #:TODO: status code to be added
-        return response_object
+        return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     status_code = response.status_code
     if status_code != ServiceConstants.__SUCCESS:
         response_object["error"] = {
@@ -45,18 +45,18 @@ def fetch_user_details_fb():
     user_present = user.check_if_user_id_present_in_backend(user_id=user_id)
     if "error" in user_present:
         response_object["error"] = user_present["error"]
-        return response_object
+        return response_object, ServiceConstants.__BAD_REQUEST
     #create new user in backend
     property_string = helper.create_property_string("user",content)
     if "error" in property_string:
         response_object["error"] = property_string["error"]
         #:TODO: status code to be added
-        return response_object
+        return response_object, ServiceConstants.__BAD_REQUEST
     user_created = user.create_or_update_user(property_string["properties"][:-2],user_id)
     if "error" in user_created:
         #:TODO: status code to be added
         response_object["error"] = user_created["error"]
-        return response_object
+        return response_object, ServiceConstants.__BAD_REQUEST
     if (user_present["result"] == False):     
         response_object["user_type"] = "new_user"
     else:
@@ -86,15 +86,12 @@ def create_a_user():
         if_email_is_present = val.check_if_email_present(email)
         if "error" in if_email_is_present:
             response_object["error"]= if_email_is_present["error"]
-            return response_object
-        print("*****")
-        print(data)
-        print("*****")
+            return response_object, ServiceConstants.__BAD_REQUEST
         tokens = Authorizer.generate_tokens(data)
         if "error" in tokens:
             response_object["error"] = tokens["error"]
             #:TODO: status code to be added
-            return response_object
+            return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         tokens = tokens["tokens"]
         password = data["password"]
         saltandHasofpass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -103,13 +100,13 @@ def create_a_user():
         if "error" in property_string:
             response_object["error"] = property_string["error"]
             #:TODO: status code to be added
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         user = User()
         user_created = user.create_or_update_user(property_string["properties"][:-2],user_id)
         if "error" in user_created:
             response_object["error"] = property_string["error"]
             #:TODO: status code to be added
-            return response_object
+            return response_object, ServiceConstants.__BAD_REQUEST
         response_object["data"] = data
         response_object["access_token"] = tokens["access_token"]
         response_object["refresh_token"] = tokens["refresh_token"]
@@ -127,18 +124,18 @@ def login_a_user():
     user_details = helper.get_user_details(email=email,graph=graph)
     if "error" in user_details:
         response["error"] = user_details["error"]
-        return response
+        return response, ServiceConstants.__BAD_REQUEST
     user_details = dict(user_details["data"])
     hashAndSalt = user_details["password"]
     valid = bcrypt.checkpw(password.encode('utf-8'), hashAndSalt.encode('utf-8'))
     if valid is False:
         response_object["error"] = "Password incorrect. Please re enter"
-        return response_object
+        return response_object, ServiceConstants.__BAD_REQUEST
     tokens = Authorizer.generate_tokens(data)
     if "error" in tokens:
         response_object["error"] = tokens["error"]
         #:TODO: status code to be added
-        return response_object
+        return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     tokens = tokens["tokens"]
     response_object["data"] = user_details
     response_object["access_token"] = tokens["access_token"]
@@ -155,7 +152,7 @@ def fetch_user_blogs(user_id):
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         #:TODO: return status code
-        return response_object
+        return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     blogs = user.fetch_user_blogs(user_id)
     print(blogs)
     return blogs
@@ -168,14 +165,11 @@ def is_token_valid():
     access_token = request.args.get('access_token')
     # Authorizer.
     auth_result = Authorizer.validate_token(access_token)
-    print("*****")
-    print(auth_result)
-    print("*****")
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         response_object["is_valid"] = False
         #:TODO: return status code
-        return response_object
+        return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     response_object["is_valid"] = True
     return response_object
 
