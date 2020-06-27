@@ -54,7 +54,6 @@ def validate_token(access_token):
     response = {}
     try:
         decoded_jwt = jwt.decode(access_token, 'pet-share-india', algorithms=['HS256'])
-        print(decoded_jwt)
         response["user_id"] = decoded_jwt["data"]["id"] 
         return response
     except Exception as err:
