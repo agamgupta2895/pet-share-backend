@@ -160,3 +160,19 @@ def fetch_user_blogs(user_id):
     print(blogs)
     return blogs
     #response_object["data"] = user_details
+
+
+@userService.route(api_routes.__TOKEN_VALIDITY,methods = ["GET"])
+def is_token_valid():
+    response_object = {}
+    access_token = request.args.get('access_token')
+    # Authorizer.
+    auth_result = Authorizer.validate_token(access_token)
+    if 'error' in auth_result:
+        response_object["error"] = str(auth_result["error"])
+        response_object["is_valid"] = False
+        #:TODO: return status code
+        return response_object
+    response_object["is_valid"] = True
+    #response_object["data"] = user_details
+

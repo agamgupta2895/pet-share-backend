@@ -10,5 +10,7 @@ __ADD_IMAGE = "/api/v1/blogs/image"
 
 
 #USER
-
 __USER_BLOGS = "/api/v1/user/<user_id>/blogs"
+
+#TOKEN
+__TOKEN_VALIDITY = "/api/v1/token"
