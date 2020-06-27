@@ -174,5 +174,5 @@ def is_token_valid():
         #:TODO: return status code
         return response_object
     response_object["is_valid"] = True
-    #response_object["data"] = user_details
+    return response_object
 
