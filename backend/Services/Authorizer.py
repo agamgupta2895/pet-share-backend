@@ -50,7 +50,7 @@ def generate_tokens(data):
         response["error"] = str(err)
         return response
 
-def validate_token(access_token):
+def validate_token(access_token,fields=None):
     response = {}
     try:
         try:
@@ -58,7 +58,9 @@ def validate_token(access_token):
         except Exception as err:
             response["error"] = "Invalid token provided" 
             return response
-        response["user_id"] = decoded_jwt["data"]["id"]
+        for item in fields:
+            if item in decoded_jwt["data"]:
+                response[item] = decoded_jwt["data"][item]
         return response
     except Exception as err:
         response["error"] = str(err)

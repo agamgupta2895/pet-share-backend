@@ -148,7 +148,7 @@ def fetch_user_blogs(user_id):
     user = User()
     access_token = request.headers['Authorization']
     # Authorizer.
-    auth_result = Authorizer.validate_token(access_token)
+    auth_result = Authorizer.validate_token(access_token,fields=["id"])
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         #:TODO: return status code
@@ -164,12 +164,15 @@ def is_token_valid():
     response_object = {}
     access_token = request.args.get('access_token')
     # Authorizer.
-    auth_result = Authorizer.validate_token(access_token)
+    auth_result = Authorizer.validate_token(access_token,fields=["id","name","picture"])
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         response_object["is_valid"] = False
         #:TODO: return status code
         return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
+    #:TODO: sending access token for now. to be removed
+    response_object["data"] = auth_result
     response_object["is_valid"] = True
+    response_object["access_token"] = access_token
     return response_object
 

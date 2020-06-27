@@ -30,7 +30,7 @@ def blogs_crud():
     elif request.method == "POST":
         access_token = request.headers['Authorization']
         # Authorizer.
-        auth_result = Authorizer.validate_token(access_token)
+        auth_result = Authorizer.validate_token(access_token,fields=["id"])
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
@@ -41,7 +41,7 @@ def blogs_crud():
         if image == None:
             print("No image found")
         data = request.form.get("data")
-        user_id = auth_result["user_id"]
+        user_id = auth_result["id"]
         blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
@@ -58,13 +58,13 @@ def blogs(blog_id):
         #call blogs object
         if 'Authorization' in request.headers:
             access_token = request.headers['Authorization']
-            auth_result = Authorizer.validate_token(access_token)
+            auth_result = Authorizer.validate_token(access_token,fields=["id"])
             if 'error' in auth_result:
                 response_object["error"] = str(auth_result["error"])
                 #:TODO: return status code
                 return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
             print(auth_result)
-            user_id = auth_result["user_id"]
+            user_id = auth_result["id"]
         blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
         if "error" in blog:
             response_object["error"] = blog["error"]
@@ -74,12 +74,12 @@ def blogs(blog_id):
     elif request.method == "DELETE":
         #Delete blog
         access_token = request.headers['Authorization']
-        auth_result = Authorizer.validate_token(access_token)
+        auth_result = Authorizer.validate_token(access_token,fields=["id"])
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
-        user_id = auth_result["user_id"]
+        user_id = auth_result["id"]
         blog_deleted = blog.delete_a_blog(user_id,blog_id)
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]
@@ -92,7 +92,7 @@ def blogs(blog_id):
 def add_image():
     response_object = {}
     access_token = request.headers['Authorization']
-    auth_result = Authorizer.validate_token(access_token)
+    auth_result = Authorizer.validate_token(access_token,fields=["id"])
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         #:TODO: return status code
