@@ -46,7 +46,6 @@ class Blog:
             else:
                 node["is_owner"] = False
             response["Blog"] = node
-            print(response)
             return response
         except Exception as err:
             response["error"] = str(err)
@@ -187,6 +186,21 @@ class Blog:
             else:
                 response["error"] = "Invalid user trying to delete the blog"
                 return response
+        except Exception as err:
+            response["error"] = str(err)
+            return response
+    def add_cookie(self,blog_id):
+        """
+        """
+        response = {}
+        try:
+            query_to_add_counter = """
+                Match(blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
+                set blog.cookie = toInteger(blog.cookie) + 1
+            """
+            graph_response = self.graph.run(query_to_add_counter)
+            response["result"] = "Cookie added successfully"
+            return response
         except Exception as err:
             response["error"] = str(err)
             return response

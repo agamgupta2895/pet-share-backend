@@ -38,8 +38,6 @@ def blogs_crud():
         #Create new blog
         #create  new blog id
         image =  request.files.get('image')
-        if image == None:
-            print("No image found")
         data = request.form.get("data")
         user_id = auth_result["id"]
         blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
@@ -107,3 +105,19 @@ def add_image():
     response_object["result"] = image_added["result"]
     return response_object
 
+@blogsService.route(api_routes.__ADD_COOKIE,methods=["POST"])
+def add_cookie(blog_id):
+    response_object = {}
+    access_token = request.headers['Authorization']
+    auth_result = Authorizer.validate_token(access_token,fields=["id"])
+    if 'error' in auth_result:
+        response_object["error"] = str(auth_result["error"])
+        #:TODO: return status code
+        return response_object
+    blog = Blog()
+    add_a_cookie = blog.add_cookie(blog_id)
+    if "error" in add_a_cookie:
+        response_object["error"] = image_added["error"]
+        return response_object, ServiceConstants.__BAD_REQUEST
+    response_object["result"] = add_a_cookie["result"]
+    return response_object

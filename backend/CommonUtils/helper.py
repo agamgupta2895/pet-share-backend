@@ -49,7 +49,10 @@ def get_user_details(email=None,user_id=None,graph=None):
                             EMAIL = email
                         )
         graph_response = graph.run(user_details_query).data()
-        response["data"] = graph_response[0]["user"]
+        if len(graph_response)>0:
+            response["data"] = graph_response[0]["user"]
+            return response
+        response["error"] = "User not found"
         return response
     except Exception as err:
         response["error"] = str(err)
