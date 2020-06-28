@@ -8,4 +8,4 @@ __BUCKET_NAME = "pet-share-india"
 #Status codes
 __SUCCESS = 200
 __BAD_REQUEST = 400
-__INVALID_ACCESS_TOKEN = 190
+__INVALID_ACCESS_TOKEN = 401
