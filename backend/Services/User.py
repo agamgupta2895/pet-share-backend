@@ -13,7 +13,7 @@ from py2neo import Graph,Node,Relationship
 userService = Blueprint("userService",__name__)
 
 
-graph = Graph("http://35.154.113.82:7474",user="neo4j",password="pet-share-india")
+graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
 
 @userService.route(api_routes.__LOGIN_USER_FB,methods = ["GET"])
 def fetch_user_details_fb():

@@ -6,7 +6,7 @@ import json
 from CommonUtils import helper
 class Blog:
     def __init__(self):
-        self.graph = Graph("http://35.154.113.82:7474",user="neo4j",password="pet-share-india")
+        self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
         self.client = boto3.client('s3')
     def fetch_all_blogs(self,user_id):
         """

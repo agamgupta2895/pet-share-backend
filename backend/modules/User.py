@@ -2,7 +2,7 @@ from py2neo import Graph,Node,Relationship
 
 class User:
     def __init__(self):
-        self.graph = Graph("http://35.154.113.82:7474",user="neo4j",password="pet-share-india")
+        self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
 
     def check_if_user_id_present_in_backend(self,user_id):
         """

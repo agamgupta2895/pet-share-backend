@@ -2,7 +2,7 @@ from py2neo import Graph,Node,Relationship
 
 class Validate:
     def __init__(self):
-        self.graph = Graph("http://35.154.113.82:7474",user="neo4j",password="pet-share-india")
+        self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
 
     def check_if_email_present(self,email):
         response = {}
