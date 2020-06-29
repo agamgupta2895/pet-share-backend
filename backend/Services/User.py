@@ -156,8 +156,9 @@ def fetch_user_blogs():
         #:TODO: return status code
         return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     blogs = user.fetch_user_blogs(user_id)
+    print(blogs)
     data = []
-    for item in blogs:
+    for item in blogs["data"]:
         data.append(item["blogs"])
     response_object["data"] = data
     return response_object
