@@ -6,7 +6,7 @@ import api_routes
 import api_routes_third_party
 import requests
 import json
-import bcrypt
+import bcryptp
 import uuid
 import Authorizer
 from py2neo import Graph,Node,Relationship
@@ -143,20 +143,20 @@ def login_a_user():
     return response_object
 
 @userService.route(api_routes.__USER_BLOGS,methods = ["GET"])
-def fetch_user_blogs(user_id):
+def fetch_user_blogs():
     response_object = {}
     user = User()
     access_token = request.headers['Authorization']
+
     # Authorizer.
     auth_result = Authorizer.validate_token(access_token,fields=["id"])
+    user_id = auth_result["id"]
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
         #:TODO: return status code
         return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     blogs = user.fetch_user_blogs(user_id)
-    print(blogs)
     return blogs
-    #response_object["data"] = user_details
 
 
 @userService.route(api_routes.__TOKEN_VALIDITY,methods = ["GET"])

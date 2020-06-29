@@ -10,7 +10,7 @@ __ADD_IMAGE = "/api/v1/blogs/image"
 __ADD_COOKIE = "/api/v1/blogs/<blog_id>/cookie"
 
 #USER
-__USER_BLOGS = "/api/v1/user/<user_id>/blogs"
+__USER_BLOGS = "/api/v1/user/blogs"
 
 #TOKEN
 __TOKEN_VALIDITY = "/api/v1/token"
