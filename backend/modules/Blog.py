@@ -197,7 +197,11 @@ class Blog:
             query_to_add_counter = """
                 Match(blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
                 set blog.cookie = toInteger(blog.cookie) + 1
-            """
+            """.format(
+                BLOG_LABEL = "Blog",
+                BLOG_ID = blog_id
+            )
+            print(query_to_add_counter)
             graph_response = self.graph.run(query_to_add_counter)
             response["result"] = "Cookie added successfully"
             return response

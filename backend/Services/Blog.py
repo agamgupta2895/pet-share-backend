@@ -117,7 +117,7 @@ def add_cookie(blog_id):
     blog = Blog()
     add_a_cookie = blog.add_cookie(blog_id)
     if "error" in add_a_cookie:
-        response_object["error"] = image_added["error"]
+        response_object["error"] = add_a_cookie["error"]
         return response_object, ServiceConstants.__BAD_REQUEST
     response_object["result"] = add_a_cookie["result"]
     return response_object
