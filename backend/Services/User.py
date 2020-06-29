@@ -6,7 +6,7 @@ import api_routes
 import api_routes_third_party
 import requests
 import json
-import bcryptp
+import bcrypt
 import uuid
 import Authorizer
 from py2neo import Graph,Node,Relationship
@@ -156,7 +156,11 @@ def fetch_user_blogs():
         #:TODO: return status code
         return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     blogs = user.fetch_user_blogs(user_id)
-    return blogs
+    data = []
+    for item in blogs:
+        data.append(item["blogs"])
+    response_object["data"] = data
+    return response_object
 
 
 @userService.route(api_routes.__TOKEN_VALIDITY,methods = ["GET"])
