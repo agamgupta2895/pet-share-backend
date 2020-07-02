@@ -208,3 +208,22 @@ class Blog:
         except Exception as err:
             response["error"] = str(err)
             return response
+    
+    def fetch_popular_blogs(self):
+        response = {}
+        try:
+            query_to_fetch_popular_blogs = """
+                Match(blog:{BLOG_LABEL})
+                return blog.title as title,blog.author as author,blog.id as id ,blog.cookie as cookie
+                order by toInteger(blog.cookie) desc
+                limit 5
+            """.format(
+                BLOG_LABEL = "Blog"
+            )
+            graph_response = self.graph.run(query_to_fetch_popular_blogs)
+            response["result"] = graph_response.data()
+            return response
+        except Exception as err:
+            response["error"] = str(err)
+            return response
+    

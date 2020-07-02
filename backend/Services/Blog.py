@@ -63,16 +63,18 @@ def blogs(blog_id):
                 response_object["error"] = str(auth_result["error"])
                 #:TODO: return status code
                 return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
-            print(auth_result)
             user_id = auth_result["id"]
-        blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
-        if "error" in blog:
-            response_object["error"] = blog["error"]
+        single_blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
+        if "error" in single_blog:
+            response_object["error"] = single_blog["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
-        created_by = blog["Blog"]["created_by"]
+        created_by = single_blog["Blog"]["created_by"]
         user_details = helper.get_user_details(user_id=created_by)
+        popular_blogs = blog.fetch_popular_blogs()
+        print(popular_blogs)
         response_object["user_details"] = user_details["data"]
-        response_object["data"] = blog
+        response_object["data"] = single_blog
+        response_object["popular_blogs"] = popular_blogs["result"]
         return response_object
     elif request.method == "DELETE":
         #Delete blog
