@@ -11,6 +11,8 @@ import hashlib
 
 blogsService = Blueprint("blogService",__name__)
 
+
+
 @blogsService.route(api_routes.__BLOGS_CU,methods = ["POST","GET"])
 def blogs_crud():
     response_object = {}
@@ -67,6 +69,9 @@ def blogs(blog_id):
         if "error" in blog:
             response_object["error"] = blog["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
+        created_by = blog["Blog"]["created_by"]
+        user_details = helper.get_user_details(user_id=created_by)
+        response_object["user_details"] = user_details["data"]
         response_object["data"] = blog
         return response_object
     elif request.method == "DELETE":

@@ -29,7 +29,7 @@ def create_property_string(entity,properties):
 def get_user_details(email=None,user_id=None,graph=None):
     """
     """
-
+    graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
     response = {}
     try:
         if user_id is not None:
