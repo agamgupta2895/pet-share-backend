@@ -214,7 +214,7 @@ class Blog:
         try:
             query_to_fetch_popular_blogs = """
                 Match(blog:{BLOG_LABEL})
-                return blog.title as title,blog.author as author,blog.id as id ,blog.cookie as cookie
+                return blog.title as title,blog.author as author,blog.id as id ,blog.cookie as cookie,blog.image_url as image_url
                 order by toInteger(blog.cookie) desc
                 limit 5
             """.format(
