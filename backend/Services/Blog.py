@@ -90,7 +90,7 @@ def blogs(blog_id):
         if "error" in blog_deleted:
             response_object["error"] = blog_deleted["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
-        response_object["message"] = blog_deleted["message"]
+        response_object["message"] = "Deleted"
         return response_object
 
 
