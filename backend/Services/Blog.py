@@ -1,5 +1,6 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Blog import Blog
+from modules.User import User
 from CommonUtils import helper
 from Contants import ServiceConstants
 import api_routes
@@ -21,7 +22,6 @@ def blogs_crud():
     blog = Blog()
     if request.method == "GET":
         #call blogs object
-        print("here")
         blogs_list = blog.fetch_all_blogs()
         if "error" in blogs_list:
             response_object["error"] = blogs_list["error"]
@@ -36,6 +36,7 @@ def blogs_crud():
             #:TODO: return status code
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         images =  request.files.getlist('images')
+
         data = request.form.get("data")
         user_id = auth_result["id"]
         blog_created = blog.create_or_update_blog(user_id=user_id,images= images,data=data)
@@ -50,6 +51,7 @@ def blogs(blog_id):
     response_object = {}
     user_id = ''
     blog = Blog()
+    user = User()
     if request.method == "GET":
         #call blogs object
         if 'Authorization' in request.headers:
@@ -65,10 +67,11 @@ def blogs(blog_id):
             response_object["error"] = single_blog["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
         created_by = single_blog["Blog"]["created_by"]
-        user_details = helper.get_user_details(user_id=created_by)
+        search = {"id":created_by}
+        user_details = user.get_node_details(search=search)
         popular_blogs = blog.fetch_popular_blogs()
-        print(popular_blogs)
-        response_object["user_details"] = user_details["data"]
+        print(user_details)
+        response_object["user_details"] = user_details["result"]["node_properties"]
         response_object["data"] = single_blog
         response_object["popular_blogs"] = popular_blogs
         return response_object
