@@ -87,8 +87,6 @@ class Blog:
         helper = Helper()
 
         try:
-            data = data.encode('ascii','ignore')
-            data = json.loads(data)
             data["created_by"] = user_id
             if "id" in data:
                 blog_id = data["id"]
@@ -113,9 +111,12 @@ class Blog:
                     images_paths.append(self.s3_base_url+image_path)
                 data["image_url"] = images_paths
             labels = ["Blog"]
+            
             blog_node = helper.create_a_new_node(labels =labels,
                                                 properties = data,
                                                 search=search)
+            print("here")
+            print(blog_node)
             if 'error' in blog_node:
                 response["error"] = blog_node["error"]
                 return response
@@ -172,7 +173,6 @@ class Blog:
         
         try:
             can_user_add_cookie = helper.fetch_a_relationship(src=src,tgt=tgt,rel="SENT")
-            print(can_user_add_cookie)
             if 'error' in can_user_add_cookie:
                 response["error"] = can_user_add_cookie["error"]
                 return response
@@ -188,6 +188,13 @@ class Blog:
                     "cookie" : can_user_add_cookie["result"]["cookie"] + 1
                 }
             cookie_result = helper.create_a_relationship(src=src,tgt=tgt,rel="SENT",properties=properties)
+            labels = ["Blog"]
+            search = {"id":blog_id}
+            blog_result = helper.find_single_node_in_db(labels=labels, search=search)
+            cookie = blog_result["node_properties"]["cookie"] + 1
+            res = helper.create_a_new_node(labels=labels,search=search,properties={"cookie":cookie})
+            if 'error' in res:
+                response["error"] = res["error"]
             response["result"] = "Cookie added successfully"
             return response
         except Exception as err:

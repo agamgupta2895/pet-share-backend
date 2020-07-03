@@ -37,7 +37,10 @@ def blogs_crud():
         images =  request.files.getlist('images')
         data = request.form.get("data")
         user_id = auth_result["id"]
+        data = data.encode('ascii','ignore')
+        data = json.loads(data)
         data["author"] = auth_result["name"]
+        print(data)
         blog_created = blog.create_or_update_blog(user_id=user_id,images= images,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
