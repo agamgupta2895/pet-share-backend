@@ -1,7 +1,6 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Blog import Blog
 from modules.User import User
-from CommonUtils import helper
 from Contants import ServiceConstants
 import api_routes
 import api_routes_third_party
