@@ -29,15 +29,15 @@ def blogs_crud():
     elif request.method == "POST":
         access_token = request.headers['Authorization']
         # Authorizer
-        auth_result = Authorizer.validate_token(access_token,fields=["id"])
+        auth_result = Authorizer.validate_token(access_token,fields=["id","name"])
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         images =  request.files.getlist('images')
-
         data = request.form.get("data")
         user_id = auth_result["id"]
+        data["author"] = auth_result["name"]
         blog_created = blog.create_or_update_blog(user_id=user_id,images= images,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
