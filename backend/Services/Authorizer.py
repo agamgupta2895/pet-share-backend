@@ -2,7 +2,6 @@ import requests
 import api_routes_third_party
 import json
 from Contants import ServiceConstants
-from CommonUtils import helper
 from User import User
 import jwt
 import datetime
