@@ -3,26 +3,26 @@ import uuid
 from Contants import ServiceConstants
 import boto3
 import json
-from CommonUtils import helper
+from CommonUtils.Helper import Helper
 class Blog:
     def __init__(self):
-        self.s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
-        self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
         self.client = boto3.client('s3')
-    def fetch_all_blogs(self,user_id):
+        self.s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
+
+    def fetch_all_blogs(self):
         """
         :user_id - ID of the logged in user
         :response - 
         """
         response = {}
+        helper = Helper()
+        labels = ["Blog"]
         try:
-            graph_response = self.graph.run("""
-                                    Match (node:{BLOG_LABEL})
-                                    return node
-                                    """.format(
-                                            BLOG_LABEL = "Blog"
-                                    )).data()
-            return graph_response
+            blogs = helper.find_nodes_in_db(labels=labels)
+            if 'error' in blogs:
+                return blogs
+            response["data"] = blogs
+            return response
         except Exception as err:
             response["error"] = str(err)
             return response
@@ -32,21 +32,25 @@ class Blog:
         :user_id - ID of the logged in user
         :response - 
         """
-        response = {}        
+        response = {}
+        helper = Helper()
+        labels = ["Blog"]
+        search = {"id":blog_id}
         try:
-            graph_response = self.graph.run("""
-                                    Match (node:{BLOG_LABEL}  {{id:"{BLOG_ID}"}})
-                                    return node
-                                    """.format(
-                                            BLOG_LABEL = "Blog",
-                                            BLOG_ID = blog_id
-                                    )).data()
-            node = dict(graph_response[0]["node"])
-            if user_id == node["created_by"]:
-                node["is_owner"] = True
+            blog = helper.find_single_node_in_db(labels = labels,search=search)
+            print(blog)
+            if 'error' in blog:
+                response["error"] = blog["error"]
+                return response
+            if 'errorMessage' in blog:
+                response["error"] = blog["errorMessage"]
+                return response
+            blog = blog["node_properties"]
+            if user_id == blog["created_by"]:
+                blog["is_owner"] = True
             else:
-                node["is_owner"] = False
-            response["Blog"] = node
+                blog["is_owner"] = False
+            response["Blog"] = blog
             return response
         except Exception as err:
             response["error"] = str(err)
@@ -80,25 +84,22 @@ class Blog:
         :response - 
         """
         response = {}
+        helper = Helper()
+
         try:
             data = data.encode('ascii','ignore')
             data = json.loads(data)
             data["created_by"] = user_id
-            user_details = helper.get_user_details(user_id=user_id,graph=self.graph)
-            if "error" in user_details:
-                response["error"] = user_details["error"]
-                return response
-            user_details = dict(user_details["data"])
-            data["author"] = user_details["name"]
-            
             if "id" in data:
                 blog_id = data["id"]
             else:
                 blog_id = uuid.uuid4().hex
                 data["id"]= blog_id
+            search = {"id":data["id"]}
             if images is not None:
                 images_paths = []
                 for image in images:
+                    print(images)
                     image_id = str(uuid.uuid4().hex)
                     image_path = "blogs/"+str(blog_id)+"/"+image_id+".jpg"
                     bucket_name = 'pet-share-india'
@@ -111,32 +112,24 @@ class Blog:
                         )
                     images_paths.append(self.s3_base_url+image_path)
                 data["image_url"] = images_paths
-            property_string = helper.create_property_string("blog",data)
-            property_string = property_string["properties"][:-2]
-            blog_query = """
-                    MERGE (blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
-                    ON CREATE SET
-                    {PROPERTY_STRING}
-                    ON MATCH SET
-                    {PROPERTY_STRING}
-                    """.format(
-                            BLOG_LABEL = "Blog",
-                            PROPERTY_STRING = property_string,
-                            BLOG_ID = blog_id
-                    )
-            graph_response = self.graph.run(blog_query).data()
-            relationship_query = """
-                        Match (user:{USER_LABEL} {{id: "{USER_ID}"}})
-                        MATCH (blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
-                        MERGE (user)-[rel:{RELATIONSHIP_NAME}]->(blog)
-                    """.format(
-                        USER_LABEL = "User",
-                        USER_ID = user_id,
-                        BLOG_LABEL = "Blog",
-                        BLOG_ID = blog_id,
-                        RELATIONSHIP_NAME = "CREATED"
-                    )
-            graph_response = self.graph.run(relationship_query).data()
+            labels = ["Blog"]
+            blog_node = helper.create_a_new_node(labels =labels,
+                                                properties = data,
+                                                search=search)
+            if 'error' in blog_node:
+                response["error"] = blog_node["error"]
+                return response
+            src = {
+                "labels" :["User"],
+                "search":{"id":user_id}
+            }
+            tgt = {
+                "labels" :["Blog"],
+                "search" : {"id":blog_id}
+            }
+            relationship  = helper.create_a_relationship(src=src,tgt=tgt,rel="CREATED")                 
+            if 'error' in relationship:
+                response["error"] = relationship["error"]
             return response
             
         except Exception as err:
@@ -146,66 +139,55 @@ class Blog:
         """
         """
         response = {}
+        helper = Helper()
+        labels = ["Blog"]
+        search = {"id":blog_id}
         try:
-            query_to_fetch_blog = """
-                            Match(user:{USER_LABEL} {{id:"{USER_ID}"}})-[rel:{CREATED_LABEL}]->(blog:{BLOG_LABEL}{{id:"{BLOG_ID}"}})
-                            return blog
-                        """.format(
-                            USER_ID = user_id,
-                            USER_LABEL = "User",
-                            CREATED_LABEL = "CREATED",
-                            BLOG_LABEL = "Blog",
-                            BLOG_ID = blog_id
-                        )
-            graph_response = self.graph.run(query_to_fetch_blog).data()
-            if len(graph_response) > 0 :
-                graph_response = graph_response[0]["blog"]
-                if "image_url" in graph_response:
-                    image_url = graph_response["image_url"]
-                    path = image_url.split("/")
-                    path = path[-3] + "/" + path[-2] + "/" + path[-1]
-                    delete_list = [
-                        {
-                            'Key' : path
-                        }
-                    ]
-                    bucket = self.client.delete_objects(
-                        Bucket = "pet-share-india",
-                        Delete = {
-                            'Objects' : delete_list
-                        }
-                    )
-                
-                query_to_delete_blog = """
-                                Match (blog:{BLOG_LABEL}{{id:"{BLOG_ID}"}})
-                                detach delete blog
-                            """.format(
-                                BLOG_LABEL = "Blog",
-                                BLOG_ID=blog_id
-                            )
-                graph_response = self.graph.run(query_to_delete_blog).data()
-                response["message"] = "delete successfully"
+
+            deleted_entity = helper.delete_single_node_in_db(labels=labels,search=search)
+            if 'error' in deleted_entity:
+                response["error"] = deleted_entity["error"]
                 return response
-            else:
-                response["error"] = "Invalid user trying to delete the blog"
-                return response
+            s3 = boto3.resource('s3')
+            bucket = s3.Bucket('pet-share-india')
+            bucket.objects.filter(Prefix="pet-share-india/blogs/"+blog_id).delete()
+            response["result"] = "Deleted successfully"
+            return response
         except Exception as err:
             response["error"] = str(err)
             return response
-    def add_cookie(self,blog_id):
+    def add_cookie(self,blog_id,user_id):
         """
         """
         response = {}
+        helper = Helper()
+        src = {
+                "labels" :["User"],
+                "search":{"id":user_id}
+            }
+        tgt = {
+            "labels" :["Blog"],
+            "search" : {"id":blog_id}
+        }
+        
         try:
-            query_to_add_counter = """
-                Match(blog:{BLOG_LABEL} {{id:"{BLOG_ID}"}})
-                set blog.cookie = toInteger(blog.cookie) + 1
-            """.format(
-                BLOG_LABEL = "Blog",
-                BLOG_ID = blog_id
-            )
-            print(query_to_add_counter)
-            graph_response = self.graph.run(query_to_add_counter)
+            can_user_add_cookie = helper.fetch_a_relationship(src=src,tgt=tgt,rel="SENT")
+            print(can_user_add_cookie)
+            if 'error' in can_user_add_cookie:
+                response["error"] = can_user_add_cookie["error"]
+                return response
+            elif 'result' in can_user_add_cookie and can_user_add_cookie["result"]["cookie"] > 4:
+                response["error"] = "User cannot add more cookies"
+                return response
+            elif 'errorMessage' in can_user_add_cookie:
+                properties = {
+                    "cookie" : 1
+                }
+            else:
+                properties = {
+                    "cookie" : can_user_add_cookie["result"]["cookie"] + 1
+                }
+            cookie_result = helper.create_a_relationship(src=src,tgt=tgt,rel="SENT",properties=properties)
             response["result"] = "Cookie added successfully"
             return response
         except Exception as err:
@@ -214,18 +196,14 @@ class Blog:
     
     def fetch_popular_blogs(self):
         response = {}
+        helper = Helper()
+        labels = ["Blog"]
         try:
-            query_to_fetch_popular_blogs = """
-                Match(blog:{BLOG_LABEL})
-                return blog.title as title,blog.author as author,blog.id as id ,blog.cookie as cookie,blog.image_url as image_url
-                order by toInteger(blog.cookie) desc
-                limit 5
-            """.format(
-                BLOG_LABEL = "Blog"
-            )
-            graph_response = self.graph.run(query_to_fetch_popular_blogs)
-            response["result"] = graph_response.data()
-            return response
+            popular_blogs = helper.fetch_popular_blogs(labels=labels)
+            if 'error' in popular_blogs:
+                response["error"] = popular_blogs["error"]
+                return response
+            return popular_blogs
         except Exception as err:
             response["error"] = str(err)
             return response

@@ -1,52 +1,41 @@
 from py2neo import Graph,Node,Relationship
-
+from CommonUtils.Helper import Helper
 class User:
     def __init__(self):
         self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
 
-    def check_if_user_id_present_in_backend(self,user_id):
+    def check_if_user_present_in_backend(self,search):
         """
         :user_id - ID of the logged in user
         :response - True/False 
         """
         response = {}
+        labels = ["User"]
         try:
-            graph_response = self.graph.run("""
-                                    Match (node:{USER_LABEL} {{id:"{USER_ID}"}})
-                                    return node
-                                    """.format(
-                                            USER_LABEL = "User",
-                                            USER_ID = user_id
-                                    )).data()
-            if len(graph_response) > 0:
-                response["result"] = True
+            helper = Helper()
+            user_present = helper.find_single_node_in_db(labels=labels,
+                                            search = search)
+            if 'error' in user_present:
+                response["error"] = user_present["error"]
                 return response
-            response["result"] = False
-            return response
+            return user_present
         except Exception as err:
             response["error"] = str(err)
             return response
 
-    def create_or_update_user(self, property_string,user_id):
+    def create_or_update_user(self, content,user_id):
         """
         :data - data of the logged in user
         :response - True/False 
         """
         response = {}
+        helper = Helper()
+        labels = ["User"]
+        search = {"id":user_id}
         try:
-            query = """
-                    MERGE (user:{USER_LABEL} {{id:"{USER_ID}"}})
-                    ON CREATE SET
-                    {PROPERTY_STRING}
-                    ON MATCH SET
-                    {PROPERTY_STRING}
-                    """.format(
-                            USER_LABEL = "User",
-                            PROPERTY_STRING = property_string,
-                            USER_ID = user_id
-                    )
-            print(query)
-            graph_response = self.graph.run(query)
+            user = helper.create_a_new_node(labels= labels,properties = content,search = search)
+            if 'error' in user:
+                return user
             return response
         except Exception as err:
             response["error"] = str(err)
@@ -55,6 +44,7 @@ class User:
     def fetch_user_blogs(self,user_id):
 
         response = {}
+        helper = Helper()
         try:
             query = """
                 Match(user:{USER_LABEL} {{id:"{USER_ID}"}})-[rel:{CREATED_LABEL}]->(blogs:{BLOG_LABEL})
@@ -72,3 +62,18 @@ class User:
             response["error"] = str(err)
             return response
 
+    def get_node_details(self,search):
+        response = {}
+        labels = ["User"]
+        try:
+            helper = Helper()
+            user_present = helper.find_single_node_in_db(labels=labels,
+                                            search = search)
+            if 'error' in user_present:
+                response["error"] = user_present["error"]
+                return response
+            response["result"] = user_present
+            return response
+        except Exception as err:
+            response["error"] = str(err)
+            return response

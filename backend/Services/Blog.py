@@ -9,6 +9,7 @@ import json
 import Authorizer
 import hashlib
 
+
 blogsService = Blueprint("blogService",__name__)
 
 
@@ -20,25 +21,20 @@ def blogs_crud():
     blog = Blog()
     if request.method == "GET":
         #call blogs object
-        blogs_list = blog.fetch_all_blogs(user_id="user_id")
+        print("here")
+        blogs_list = blog.fetch_all_blogs()
         if "error" in blogs_list:
             response_object["error"] = blogs_list["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
-        data = []
-        for item in blogs_list:
-            data.append(item["node"])
-        response_object["data"] = data
-        return response_object
+        return blogs_list
     elif request.method == "POST":
         access_token = request.headers['Authorization']
-        # Authorizer.
+        # Authorizer
         auth_result = Authorizer.validate_token(access_token,fields=["id"])
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
-        #Create new blog
-        #create  new blog id
         images =  request.files.getlist('images')
         data = request.form.get("data")
         user_id = auth_result["id"]
@@ -65,16 +61,16 @@ def blogs(blog_id):
                 return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
             user_id = auth_result["id"]
         single_blog = blog.fetch_blog(user_id=user_id,blog_id=blog_id)
-        if "error" in single_blog:
+        if "error" in single_blog or 'errorMessage' in single_blog:
             response_object["error"] = single_blog["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
         created_by = single_blog["Blog"]["created_by"]
         user_details = helper.get_user_details(user_id=created_by)
         popular_blogs = blog.fetch_popular_blogs()
+        print(popular_blogs)
         response_object["user_details"] = user_details["data"]
-        print(response_object["user_details"])
         response_object["data"] = single_blog
-        response_object["popular_blogs"] = popular_blogs["result"]
+        response_object["popular_blogs"] = popular_blogs
         return response_object
     elif request.method == "DELETE":
         #Delete blog
@@ -121,8 +117,9 @@ def add_cookie(blog_id):
         response_object["error"] = str(auth_result["error"])
         #:TODO: return status code
         return response_object
+    user_id = auth_result["id"]
     blog = Blog()
-    add_a_cookie = blog.add_cookie(blog_id)
+    add_a_cookie = blog.add_cookie(blog_id=blog_id,user_id=user_id)
     if "error" in add_a_cookie:
         response_object["error"] = add_a_cookie["error"]
         return response_object, ServiceConstants.__BAD_REQUEST
