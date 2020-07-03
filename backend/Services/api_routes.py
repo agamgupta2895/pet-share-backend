@@ -9,6 +9,14 @@ __BLOG = "/api/v1/blogs/<blog_id>"
 __ADD_IMAGE = "/api/v1/blogs/image"
 __ADD_COOKIE = "/api/v1/blogs/<blog_id>/cookie"
 
+#PETS
+__PETS_CU = "/api/v1/pets"
+
+
+#CONFIG
+
+__PETS_TYPE_DETAILS = "/api/v1/pets/type"
+
 #USER
 __USER_BLOGS = "/api/v1/user/blogs"
 

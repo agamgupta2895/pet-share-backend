@@ -28,6 +28,7 @@ def fetch_user_details_fb():
     response = requests.get(url = url,params=params)
     content = json.loads(response.content)
     content["type"] = "fb-user"
+    content["picture"] = content["picture"]["data"]["url"]
     tokens = Authorizer.generate_tokens(content)
     if "error" in tokens:
         response_object["error"] = tokens["error"]

@@ -6,6 +6,7 @@ import json
 from CommonUtils import helper
 class Blog:
     def __init__(self):
+        self.s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
         self.graph = Graph("http://3.7.71.31:7474",user="neo4j",password="pet-share-india")
         self.client = boto3.client('s3')
     def fetch_all_blogs(self,user_id):
@@ -73,7 +74,7 @@ class Blog:
         except Exception as err:
             response["error"] = str(err)
             return response
-    def create_or_update_blog(self,user_id,image,data):
+    def create_or_update_blog(self,user_id,images,data):
         """
         :user_id - ID of the logged in user
         :response - 
@@ -95,19 +96,21 @@ class Blog:
             else:
                 blog_id = uuid.uuid4().hex
                 data["id"]= blog_id
-            if image is not None:
-                blog_path = "blogs/"+str(blog_id)+"/blog_image.jpg"
-                bucket_name = 'pet-share-india'
-                response = self.client.put_object(
-                        ACL = 'public-read',
-                        Bucket = bucket_name,
-                        Key= blog_path,
-                        Body = image,
-                        ContentType = 'image/png'
-                    )
-                
-                s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
-                data["image_url"] = s3_base_url + blog_path
+            if images is not None:
+                images_paths = []
+                for image in images:
+                    image_id = str(uuid.uuid4().hex)
+                    image_path = "blogs/"+str(blog_id)+"/"+image_id+".jpg"
+                    bucket_name = 'pet-share-india'
+                    response = self.client.put_object(
+                            ACL = 'public-read',
+                            Bucket = bucket_name,
+                            Key= image_path,
+                            Body = image,
+                            ContentType = 'image/png'
+                        )
+                    images_paths.append(self.s3_base_url+image_path)
+                data["image_url"] = images_paths
             property_string = helper.create_property_string("blog",data)
             property_string = property_string["properties"][:-2]
             blog_query = """

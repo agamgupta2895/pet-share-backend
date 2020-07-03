@@ -39,10 +39,10 @@ def blogs_crud():
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
         #Create new blog
         #create  new blog id
-        image =  request.files.get('image')
+        images =  request.files.getlist('images')
         data = request.form.get("data")
         user_id = auth_result["id"]
-        blog_created = blog.create_or_update_blog(user_id=user_id,image= image,data=data)
+        blog_created = blog.create_or_update_blog(user_id=user_id,images= images,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
@@ -71,8 +71,8 @@ def blogs(blog_id):
         created_by = single_blog["Blog"]["created_by"]
         user_details = helper.get_user_details(user_id=created_by)
         popular_blogs = blog.fetch_popular_blogs()
-        print(popular_blogs)
         response_object["user_details"] = user_details["data"]
+        print(response_object["user_details"])
         response_object["data"] = single_blog
         response_object["popular_blogs"] = popular_blogs["result"]
         return response_object

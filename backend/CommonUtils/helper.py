@@ -14,6 +14,7 @@ def create_property_string(entity,properties):
     try:
 
         str_properties = ""
+        print(properties)
         for key,value in properties.items():
             value = str(value)   
             value = value.replace('"', '\\"')
@@ -21,6 +22,7 @@ def create_property_string(entity,properties):
                         + "\"" + str(value) + "\",\n"""
             str_properties = str_properties + row
         response["properties"] = str_properties
+        print(response)
         return response
     except Exception as err:
         response["error"] = str(err)
