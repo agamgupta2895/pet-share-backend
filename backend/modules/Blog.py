@@ -115,8 +115,6 @@ class Blog:
             blog_node = helper.create_a_new_node(labels =labels,
                                                 properties = data,
                                                 search=search)
-            print("here")
-            print(blog_node)
             if 'error' in blog_node:
                 response["error"] = blog_node["error"]
                 return response

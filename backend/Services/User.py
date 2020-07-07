@@ -113,8 +113,9 @@ def login_a_user():
         password = data["password"]
         search = {"email":email}
         if_user_present = user.check_if_user_present_in_backend(search=search)
+        print(if_user_present)
         if "error" in if_user_present or 'errorMessage' in if_user_present:
-            response_object["error"]= if_user_present["error"]
+            response_object["error"]= "Email id not present in DB"
             return response_object, ServiceConstants.__BAD_REQUEST
         user_details = if_user_present["node_properties"]
         hashAndSalt = user_details["password"]

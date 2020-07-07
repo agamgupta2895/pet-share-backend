@@ -1,6 +1,5 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Pet import Pet
-#from CommonUtils import helper
 from Contants import ServiceConstants,PetConstants
 import api_routes
 import api_routes_third_party
@@ -24,17 +23,17 @@ def pets_cu():
         
     elif request.method == "POST":
         access_token = request.headers['Authorization']
-        # Authorizer.
-        auth_result = Authorizer.validate_token(access_token,fields=["id"])
+        auth_result = Authorizer.validate_token(access_token,fields=["id","name"])
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code
             return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
-        user_id = auth_result["id"]
-        print(user_id)
         images =  request.files.getlist('images')
-        print(images)
         data = request.form.get("data")
+        user_id = auth_result["id"]
+        data = data.encode('ascii','ignore')
+        data = json.loads(data)
+        data["author"] = auth_result["name"]
         pet_profile_created = pet.create_or_update_pet_profile(user_id=user_id,images= images,data=data)
         if "error" in pet_profile_created:
             response_object["error"] = pet_profile_created["error"]
