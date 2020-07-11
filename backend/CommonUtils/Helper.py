@@ -62,7 +62,6 @@ class Helper:
     def create_a_relationship(self,src,tgt,rel,properties = None):
         response = {}
         try:
-            print("#########")
             src_node_search = src["search"]
             src_node_labels = src["labels"]
             tgt_node_search = tgt["search"]

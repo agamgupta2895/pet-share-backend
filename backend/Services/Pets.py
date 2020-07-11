@@ -18,12 +18,17 @@ def pets_cu():
     
     pet = Pet()
     if request.method == "GET":
-        #call blogs object
-        pass
+        #call pets object
+        pet_list = pet.fetch_all_pets()
+        if "error" in pet_list:
+            response_object["error"] = pet_list["error"]
+            return response_object, ServiceConstants.__BAD_REQUEST
+        return pet_list
         
     elif request.method == "POST":
         access_token = request.headers['Authorization']
         auth_result = Authorizer.validate_token(access_token,fields=["id","name"])
+        print(auth_result)
         if 'error' in auth_result:
             response_object["error"] = str(auth_result["error"])
             #:TODO: return status code

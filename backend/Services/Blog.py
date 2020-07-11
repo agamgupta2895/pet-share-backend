@@ -40,7 +40,6 @@ def blogs_crud():
         data = data.encode('ascii','ignore')
         data = json.loads(data)
         data["author"] = auth_result["name"]
-        print(data)
         blog_created = blog.create_or_update_blog(user_id=user_id,images= images,data=data)
         if "error" in blog_created:
             response_object["error"] = blog_created["error"]
@@ -72,10 +71,9 @@ def blogs(blog_id):
         search = {"id":created_by}
         user_details = user.get_node_details(search=search)
         popular_blogs = blog.fetch_popular_blogs()
-        print(user_details)
-        response_object["user_details"] = user_details["result"]["node_properties"]
+        response_object["userDetails"] = user_details["result"]["node_properties"]
         response_object["data"] = single_blog
-        response_object["popular_blogs"] = popular_blogs
+        response_object["popularBlogs"] = popular_blogs
         return response_object
     elif request.method == "DELETE":
         #Delete blog

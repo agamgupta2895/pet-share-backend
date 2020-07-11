@@ -11,6 +11,7 @@ class Pet:
         self.client = boto3.client('s3')
         self.s3_base_url = "https://pet-share-india.s3.ap-south-1.amazonaws.com/"
     def create_or_update_pet_profile(self,user_id,images,data):
+
         """
         :user_id - ID of the logged in user
         :response - 
@@ -19,14 +20,15 @@ class Pet:
         helper = Helper()
 
         try:
-            data["created_by"] = user_id
-            pet_type = data["pet_type"]
-            pet_breed = data["pet_breed"]
+            data["createdBy"] = user_id
+            pet_type = data["petType"]
+            pet_breed = data["petBreed"]
             if "id" in data:
                 pet_id = data["id"]
             else:
                 pet_id = uuid.uuid4().hex
                 data["id"]= pet_id
+                data["available"] = True
             search = {"id":data["id"]}
             if images is not None:
                 images_paths = []
@@ -44,7 +46,6 @@ class Pet:
                     images_paths.append(self.s3_base_url+image_path)
                 data["image_url"] = images_paths
             labels = ["Pet",pet_type,pet_breed]
-            print("here")
             pet_node = helper.create_a_new_node(labels =labels,
                                                 properties = data,
                                                 search=search)
@@ -66,3 +67,21 @@ class Pet:
             
         except Exception as err:
             response["error"] = str(err)
+    
+    def fetch_all_pets(self):
+        """
+        :user_id - ID of the logged in user
+        :response - 
+        """
+        response = {}
+        helper = Helper()
+        labels = ["Pet"]
+        try:
+            pets = helper.find_nodes_in_db(labels=labels)
+            if 'error' in pets:
+                return pets
+            response["data"] = pets
+            return response
+        except Exception as err:
+            response["error"] = str(err)
+            return response

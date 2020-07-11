@@ -47,9 +47,9 @@ class Blog:
                 return response
             blog = blog["node_properties"]
             if user_id == blog["created_by"]:
-                blog["is_owner"] = True
+                blog["isOwner"] = True
             else:
-                blog["is_owner"] = False
+                blog["isOwner"] = False
             response["Blog"] = blog
             return response
         except Exception as err:
@@ -87,7 +87,7 @@ class Blog:
         helper = Helper()
 
         try:
-            data["created_by"] = user_id
+            data["createdBy"] = user_id
             if "id" in data:
                 blog_id = data["id"]
             else:
@@ -97,7 +97,6 @@ class Blog:
             if images is not None:
                 images_paths = []
                 for image in images:
-                    print(images)
                     image_id = str(uuid.uuid4().hex)
                     image_path = "blogs/"+str(blog_id)+"/"+image_id+".jpg"
                     bucket_name = 'pet-share-india'
@@ -109,7 +108,7 @@ class Blog:
                             ContentType = 'image/png'
                         )
                     images_paths.append(self.s3_base_url+image_path)
-                data["image_url"] = images_paths
+                data["imageUrl"] = images_paths
             labels = ["Blog"]
             
             blog_node = helper.create_a_new_node(labels =labels,

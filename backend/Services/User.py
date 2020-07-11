@@ -15,7 +15,7 @@ userService = Blueprint("userService",__name__)
 @userService.route(api_routes.__LOGIN_USER_FB,methods = ["GET"])
 def fetch_user_details_fb():
     response_object = {}
-    access_token = request.args.get('access_token')
+    access_token = request.args.get('accessToken')
     user_data_fields = ServiceConstants.__USER_DATA_FIELDS_FB
     params = {
         "access_token" : access_token,
@@ -53,8 +53,8 @@ def fetch_user_details_fb():
         return response_object, ServiceConstants.__BAD_REQUEST
     tokens = tokens["tokens"]
     response_object["data"] = content
-    response_object["access_token"] = tokens["access_token"]
-    response_object["refresh_token"] = tokens["refresh_token"]
+    response_object["accessToken"] = tokens["access_token"]
+    response_object["refreshToken"] = tokens["refresh_token"]
     return response_object
 
 @userService.route("/",methods = ["GET"])
@@ -74,7 +74,6 @@ def create_a_user():
         email = data["email"]
         search = {"email":email}
         if_email_is_present = user.check_if_user_present_in_backend(search=search)
-        print(if_email_is_present)
         if "error" in if_email_is_present:
             response_object["error"]= if_email_is_present["error"]
             return response_object, ServiceConstants.__BAD_REQUEST
@@ -96,8 +95,8 @@ def create_a_user():
             #:TODO: status code to be added
             return response_object, ServiceConstants.__BAD_REQUEST
         response_object["data"] = data
-        response_object["access_token"] = tokens["access_token"]
-        response_object["refresh_token"] = tokens["refresh_token"]
+        response_object["accessToken"] = tokens["access_token"]
+        response_object["refreshToken"] = tokens["refresh_token"]
         return response_object
     except Exception as err:
         response_object["error"] = str(err)
@@ -113,7 +112,6 @@ def login_a_user():
         password = data["password"]
         search = {"email":email}
         if_user_present = user.check_if_user_present_in_backend(search=search)
-        print(if_user_present)
         if "error" in if_user_present or 'errorMessage' in if_user_present:
             response_object["error"]= "Email id not present in DB"
             return response_object, ServiceConstants.__BAD_REQUEST
@@ -142,8 +140,6 @@ def fetch_user_blogs():
     response_object = {}
     user = User()
     access_token = request.headers['Authorization']
-
-    # Authorizer.
     auth_result = Authorizer.validate_token(access_token,fields=["id"])
     user_id = auth_result["id"]
     if 'error' in auth_result:
@@ -161,17 +157,16 @@ def fetch_user_blogs():
 @userService.route(api_routes.__TOKEN_VALIDITY,methods = ["GET"])
 def is_token_valid():
     response_object = {}
-    access_token = request.args.get('access_token')
-    # Authorizer.
+    access_token = request.args.get('accessToken')
     auth_result = Authorizer.validate_token(access_token,fields=["id","name","picture"])
     if 'error' in auth_result:
         response_object["error"] = str(auth_result["error"])
-        response_object["is_valid"] = False
+        response_object["isValid"] = False
         #:TODO: return status code
         return response_object, ServiceConstants.__INVALID_ACCESS_TOKEN
     #:TODO: sending access token for now. to be removed
     response_object["data"] = auth_result
-    response_object["is_valid"] = True
-    response_object["access_token"] = access_token
+    response_object["isValid"] = True
+    response_object["accessToken"] = access_token
     return response_object
 
