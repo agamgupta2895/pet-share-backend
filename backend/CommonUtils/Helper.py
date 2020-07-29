@@ -9,17 +9,23 @@ class Helper:
         self.nodeMatcher = NodeMatcher(self.graph)
         self.relationshipMatcher = RelationshipMatcher(self.graph)
 
-    def create_a_new_node(self,labels,properties,search):
+    def create_a_new_node(self,labels,properties,search=None):
         response = {}
         try:
-            node = self.nodeMatcher.match(*labels,**search)
-            if len(node) > 0:
-                node = node.first()
-                for key,value in properties.items():
-                    node[key] = value
-                self.graph.push(node)
+            if search is not None:
+                node = self.nodeMatcher.match(*labels,**search)
+                print(node)
+                if len(node) > 0:
+                    node = node.first()
+                    for key,value in properties.items():
+                        node[key] = value
+                    self.graph.push(node)
+                else:
+                    print("create")
+                    node = Node(*labels,**properties)
+                    self.graph.create(node)
             else:
-                node = Node(*labels,**properties)
+                node = Node(*labels)
                 self.graph.create(node)
             return response
         except Exception as err:

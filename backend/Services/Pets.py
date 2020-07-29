@@ -1,6 +1,6 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Pet import Pet
-from Contants import ServiceConstants,PetConstants
+from Contants import ServiceConstants,PetShareConstants
 import api_routes
 import api_routes_third_party
 import requests
@@ -48,5 +48,5 @@ def pets_cu():
 @petsService.route(api_routes.__PETS_TYPE_DETAILS,methods = ["GET"])
 def pet_constants():
     response_object = {}
-    response_object["data"] = PetConstants.list_of_pets_and_breeds
+    response_object["data"] = PetShareConstants.list_of_pets_and_breeds
     return response_object

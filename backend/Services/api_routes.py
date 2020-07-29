@@ -14,7 +14,7 @@ __PETS_CU = "/api/v1/pets"
 
 
 #CONFIG
-
+__TAGS = "/api/v1/tags/<type>"
 __PETS_TYPE_DETAILS = "/api/v1/pets/type"
 
 #USER

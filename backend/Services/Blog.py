@@ -1,7 +1,7 @@
 from flask import Flask,Blueprint,request,Response
 from modules.Blog import Blog
 from modules.User import User
-from Contants import ServiceConstants
+from Contants import ServiceConstants,PetShareConstants
 import api_routes
 import api_routes_third_party
 import requests
@@ -127,4 +127,11 @@ def add_cookie(blog_id):
         response_object["error"] = add_a_cookie["error"]
         return response_object, ServiceConstants.__BAD_REQUEST
     response_object["result"] = add_a_cookie["result"]
+    return response_object
+
+@blogsService.route(api_routes.__TAGS,methods=["GET"])
+def get_tags(type):
+    response_object = {}
+    if data == 'Blog':
+        response_object["data"] = PetShareConstants.list_of_tags_blog
     return response_object

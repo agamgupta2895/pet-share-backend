@@ -44,11 +44,12 @@ class Pet:
                             ContentType = 'image/png'
                         )
                     images_paths.append(self.s3_base_url+image_path)
-                data["image_url"] = images_paths
+                data["imageUrl"] = images_paths
             labels = ["Pet",pet_type,pet_breed]
             pet_node = helper.create_a_new_node(labels =labels,
                                                 properties = data,
                                                 search=search)
+            
             if 'error' in pet_node:
                 response["error"] = blog_node["error"]
                 return response

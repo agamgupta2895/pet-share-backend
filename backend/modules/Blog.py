@@ -117,6 +117,14 @@ class Blog:
             if 'error' in blog_node:
                 response["error"] = blog_node["error"]
                 return response
+
+            #Create Tag nodes
+            if 'tags' in data:
+                for item in data['tags']:
+                    labels = ["Tags"]
+                    labels.append(item)
+                    tag_node = helper.create_a_new_node(labels=labels,properties=None,search=None)
+
             src = {
                 "labels" :["User"],
                 "search":{"id":user_id}
@@ -125,6 +133,7 @@ class Blog:
                 "labels" :["Blog"],
                 "search" : {"id":blog_id}
             }
+
             relationship  = helper.create_a_relationship(src=src,tgt=tgt,rel="CREATED")                 
             if 'error' in relationship:
                 response["error"] = relationship["error"]
