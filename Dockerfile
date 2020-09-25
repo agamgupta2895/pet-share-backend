@@ -1,7 +1,9 @@
 From python
 
-RUN pip install -r /backed/requirments.txt
-COPY /backend /tmp/pet-share-backend/
+#COPY /backend ./tmp/pet-share-backend/
+COPY ./ ./
+#WORKDIR /tmp/pet-share-backend/backend
+RUN pip install -r requirements.txt
 
 
-CMD ["python","/tmp/pet-share-backedn/app.py"]
+CMD ["python","./backend/app.py"]
