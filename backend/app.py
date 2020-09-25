@@ -17,7 +17,7 @@ def hello_world():
 
 @app.route("/connectivity")
 def check_neo4j_connectivity():
-  graph = Graph("0.0.0.0:7474",user="neo4j",password="pet-share-india")
+  graph = Graph("0.0.0.0:7687",user="neo4j",password="pet-share-india")
   labels = ["Blog"]
   properties = {"name":"Your dad, Akhil!"}
   node = Node(*labels,**properties)
