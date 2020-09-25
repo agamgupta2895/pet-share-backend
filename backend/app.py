@@ -11,8 +11,8 @@ app.register_blueprint(User.userService)
 app.register_blueprint(Blog.blogsService)
 app.register_blueprint(Pets.petsService)
 
-@app.route('/landing')
+@app.route('/')
 def hello_world():
-  return 'Hello from Flask3!'
+  return 'This is a dockerized application!\n Welcome to PetShare India'
 if __name__ == '__main__':
   app.run()
