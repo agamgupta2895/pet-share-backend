@@ -1,5 +1,5 @@
 import requests
-import api_routes_third_party
+from Services import api_routes_third_party
 import json
 from Contants import ServiceConstants
 from User import User

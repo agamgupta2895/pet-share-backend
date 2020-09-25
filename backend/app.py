@@ -15,4 +15,4 @@ app.register_blueprint(Pets.petsService)
 def hello_world():
   return 'This is a dockerized application!\n Welcome to PetShare India'
 if __name__ == '__main__':
-  app.run()
+  app.run(host="0.0.0.0")

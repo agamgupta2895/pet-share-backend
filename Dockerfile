@@ -1,9 +1,12 @@
 From python
 
-#COPY /backend ./tmp/pet-share-backend/
-COPY ./ ./
-#WORKDIR /tmp/pet-share-backend/backend
+
+
+WORKDIR /app
+
+COPY . /app
+
 RUN pip install -r requirements.txt
 
-ENV PYTHONPATH "/backend"
-CMD ["sh","-c","python /backend/app.py"]
+ENV PYTHONPATH "/app"
+CMD ["python","app.py"]

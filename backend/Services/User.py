@@ -2,13 +2,14 @@ from flask import Flask,Blueprint,request,Response
 from Contants import ServiceConstants
 from modules.User import User
 from CommonUtils import Helper
-import api_routes
-import api_routes_third_party
+from Services import api_routes
+from Services import api_routes_third_party
+from Services import Authorizer
 import requests
 import json
 import bcrypt
 import uuid
-import Authorizer
+
 userService = Blueprint("userService",__name__)
 
 

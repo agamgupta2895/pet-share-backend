@@ -2,11 +2,11 @@ from flask import Flask,Blueprint,request,Response
 from modules.Blog import Blog
 from modules.User import User
 from Contants import ServiceConstants,PetShareConstants
-import api_routes
-import api_routes_third_party
+from Services import api_routes
+from Services import api_routes_third_party
+from Services import Authorizer
 import requests
 import json
-import Authorizer
 import hashlib
 
 
