@@ -2,8 +2,8 @@ from flask import Flask,Blueprint,request,Response
 from Contants import ServiceConstants
 from modules.User import User
 from CommonUtils import Helper
-from api_routes import api_routes
-from api_routes_third_party import api_routes_third_party
+import api_routes
+import api_routes_third_party
 import requests
 import json
 import bcrypt

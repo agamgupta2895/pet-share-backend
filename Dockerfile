@@ -5,5 +5,5 @@ COPY ./ ./
 #WORKDIR /tmp/pet-share-backend/backend
 RUN pip install -r requirements.txt
 
-
-CMD ["python","./backend/app.py"]
+WORKDIR /backend
+CMD ["python","app.py"]
